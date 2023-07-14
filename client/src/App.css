@@ -26,7 +26,7 @@ body {
 
 /* Header styles */
 header {
-  background-color: #5457e9;
+  background-color: white;
   color: #fcfcfc;
   display: flex;
   align-items: center;
@@ -46,7 +46,7 @@ nav ul {
 }
 
 nav ul li a {
-  color: #fcfcfc;
+  color: #5458EA;
   text-decoration: none;
 }
 
@@ -70,7 +70,7 @@ section h1 {
 footer {
   background-color: #9c9df1;
   color: #fcfcfc;
-  padding: 20px;
+  padding: 50px 20px;
   margin-top: auto;
 }
 

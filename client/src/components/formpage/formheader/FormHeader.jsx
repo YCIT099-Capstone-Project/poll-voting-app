@@ -5,22 +5,34 @@ import SearchIcon from "@mui/icons-material/Search";
 import AppsIcon from "@mui/icons-material/Apps";
 import { Avatar } from "@mui/material";
 import "./FormHeader.css";
+import logo from "../../images/Pollite.jpeg";
 import TestDrawer from "../TestDrawer";
+
 const FormHeader = () => {
   return (
     <div className="header">
-      <div className="header_info">
+      <div className="header_left">
         <TestDrawer />
-        <img
-          src={FormsLogo}
-          alt="FormsLogo"
-          style={{
-            width: "40px",
-            height: "40px",
-          }}
-          className="forms_logo"
-        />
-        <div className="info">Pollite</div>
+        <div className="logo_container">
+          <img
+            src={FormsLogo}
+            alt="FormsLogo"
+            style={{
+              width: "40px",
+              height: "40px",
+            }}
+            className="forms_logo"
+          />
+          <img
+            src={logo}
+            alt="logo"
+            style={{
+              width: "95px",
+              height: "40px",
+            }}
+            className="forms_logo"
+          />
+        </div>
       </div>
       <div className="header_search">
         <IconButton>
