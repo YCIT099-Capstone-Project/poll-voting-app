@@ -16,8 +16,11 @@ import {
   InputLabel,
   FormControl,
 } from "@mui/material";
-import { LocalizationProvider, TimePicker } from "@mui/lab";
-import AdapterDateFns from "@mui/lab/AdapterDateFns";
+import { TimePicker } from "@mui/x-date-pickers";
+
+import { LocalizationProvider } from "@mui/x-date-pickers";
+
+import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
 
 //Icons
 import {
@@ -60,9 +63,11 @@ const TimeInput = ({
               <LocalizationProvider dateAdapter={AdapterDateFns}>
                 <TimePicker
                   label="Pick Time"
-                  value={item?.time}
+                  value={item?.time || new Date()} // use current time if item?.time is not available
                   onChange={(newTime) => handleTime(item.id, newTime)}
-                  renderInput={(params) => <TextField fullWidth {...params} />}
+                  components={{
+                    TextField: TextField,
+                  }}
                 />
               </LocalizationProvider>
             </Grid>

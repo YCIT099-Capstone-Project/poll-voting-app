@@ -72,7 +72,7 @@ const RadioInput = ({
               {item.options &&
                 item.options.length > 0 &&
                 item.options.map((opt, key) => (
-                  <Box sx={{ display: "flex" }}>
+                  <Box key={opt.id} sx={{ display: "flex" }}>
                     <TextField
                       variant="outlined"
                       fullWidth

@@ -16,9 +16,9 @@ import {
   InputLabel,
   FormControl,
 } from "@mui/material";
-import AdapterDateFns from "@mui/lab/AdapterDateFns";
-import LocalizationProvider from "@mui/lab/LocalizationProvider";
-import DatePicker from "@mui/lab/DatePicker";
+import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
+import { LocalizationProvider } from "@mui/x-date-pickers";
+import { DatePicker } from "@mui/x-date-pickers";
 //Icons
 import {
   DragIndicator as DragIndicatorIcon,
@@ -61,11 +61,13 @@ const DateInput = ({
               <LocalizationProvider dateAdapter={AdapterDateFns}>
                 <DatePicker
                   label="Select Date"
-                  value={item?.date}
+                  value={item?.date || new Date()} // use today's date if item?.date is not available
                   onChange={(newDate) => {
                     handleDate(item.id, newDate);
                   }}
-                  renderInput={(params) => <TextField fullWidth {...params} />}
+                  components={{
+                    TextField: TextField,
+                  }}
                 />
               </LocalizationProvider>
             </Grid>
