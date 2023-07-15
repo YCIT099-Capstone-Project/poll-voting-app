@@ -2,8 +2,19 @@ import { Fragment, useState } from "react";
 import { Box } from "@mui/system";
 import { TextField } from "@mui/material";
 import { Paper } from "@mui/material";
+import { DatePicker, LocalizationProvider } from "@mui/x-date-pickers";
+import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
 
-const Header = ({ title, description, setTitle, setDescription }) => {
+const Header = ({
+  startDate,
+  endDate,
+  title,
+  description,
+  setTitle,
+  setDescription,
+  setStartDate,
+  setEndDate,
+}) => {
   return (
     <Fragment>
       <Box sx={{ mb: 3 }}>
@@ -28,6 +39,26 @@ const Header = ({ title, description, setTitle, setDescription }) => {
             multiline
             rows={2}
           />
+          <LocalizationProvider dateAdapter={AdapterDateFns}>
+            <DatePicker
+              label="Start Date"
+              value={startDate}
+              onChange={setStartDate}
+              renderInput={(params) => (
+                <TextField {...params} fullWidth sx={{ mb: 2 }} />
+              )}
+            />
+          </LocalizationProvider>
+          <LocalizationProvider dateAdapter={AdapterDateFns}>
+            <DatePicker
+              label="End Date"
+              value={endDate}
+              onChange={setEndDate}
+              renderInput={(params) => (
+                <TextField {...params} fullWidth sx={{ mb: 2 }} />
+              )}
+            />
+          </LocalizationProvider>
         </Paper>
       </Box>
     </Fragment>
