@@ -1,8 +1,6 @@
 import React, { useEffect, useState } from "react";
-import { ArrowDropDown, More } from "@mui/icons-material";
-import { IconButton } from "@mui/material";
-import { Storage } from "@mui/icons-material";
-import { FolderOpen } from "@mui/icons-material";
+import { ArrowDropDown, More, Storage, FolderOpen } from "@mui/icons-material";
+import { IconButton, Menu, MenuItem } from "@mui/material";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 import { useSelector } from "react-redux";
 import moment from "moment";
@@ -11,6 +9,17 @@ import { selectUser } from "../../../redux/features/userSlice";
 
 const MainFormBody = () => {
   const [polls, setPolls] = useState([]);
+  const [anchorEl, setAnchorEl] = useState(null);
+  const open = Boolean(anchorEl);
+
+  const handleMenu = (event) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
+
   const user = useSelector(selectUser);
   useEffect(() => {
     if (user && user.id) {
@@ -20,6 +29,26 @@ const MainFormBody = () => {
         .catch((err) => console.log(err));
     }
   }, [user]);
+
+  const deletePoll = (pollId) => {
+    fetch(`http://localhost:4000/deletePoll/${pollId}`, {
+      method: "DELETE",
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        if (data.message) {
+          console.log(data.message);
+          // Remove the poll from the list of polls
+          setPolls((prevPolls) =>
+            prevPolls.filter((poll) => poll.id !== pollId)
+          );
+        } else if (data.error) {
+          console.error(data.error);
+        }
+      })
+      .catch((err) => console.error(err));
+  };
+
   return (
     <div className="main_body">
       <div className="mainbody_top">
@@ -90,12 +119,37 @@ const MainFormBody = () => {
                   />
                   created {moment(poll.start_date).format("MMM D, YYYY")}
                 </div>
-                <MoreVertIcon
-                  style={{
-                    fontSize: "12px",
-                    color: "gray",
+                <IconButton onClick={handleMenu}>
+                  <MoreVertIcon
+                    style={{
+                      fontSize: "12px",
+                      color: "gray",
+                    }}
+                  />
+                </IconButton>
+                <Menu
+                  id="long-menu"
+                  anchorEl={anchorEl}
+                  keepMounted
+                  open={open}
+                  onClose={handleClose}
+                  PaperProps={{
+                    style: {
+                      maxHeight: 48 * 4.5,
+                      width: "20ch",
+                    },
                   }}
-                />
+                >
+                  <MenuItem onClick={handleClose}>Update</MenuItem>
+                  <MenuItem
+                    onClick={() => {
+                      handleClose();
+                      deletePoll(poll.id);
+                    }}
+                  >
+                    Delete
+                  </MenuItem>
+                </Menu>{" "}
               </div>
             </div>
           </div>

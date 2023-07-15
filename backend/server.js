@@ -129,6 +129,25 @@ app.get("/getPolls/:userId", (req, res) => {
     });
 });
 
+app.delete("/deletePoll/:pollId", (req, res) => {
+  const { pollId } = req.params;
+  const sql = "DELETE FROM Polls WHERE id = $1";
+  const values = [pollId];
+
+  pool
+    .query(sql, values)
+    .then((data) => {
+      if (data.rowCount > 0) {
+        res.json({ message: "Poll deleted successfully." });
+      } else {
+        res.status(404).json({ error: "Poll not found" });
+      }
+    })
+    .catch((err) => {
+      res.status(500).json({ error: "Server error" });
+    });
+});
+
 const PORT = process.env.PORT || 4000;
 app.listen(PORT, () => {
   console.log(`Server is listening on port ${PORT}`);
