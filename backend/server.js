@@ -18,6 +18,10 @@ const pool = new pg.Pool({
   },
 });
 
+app.get("/", (req, res) => {
+  res.send("Hello World");
+});
+
 app.post("/signup", (req, res) => {
   bcrypt.hash(req.body.password, 10, (err, hash) => {
     if (err) {
@@ -29,7 +33,7 @@ app.post("/signup", (req, res) => {
     pool
       .query(sql, values)
       .then((data) => {
-        res.json({ data: data.rows[0] }); // Removed token from the response
+        res.json({ data: data.rows[0] });
       })
       .catch((err) => {
         if (err.constraint === "users_email_key") {
@@ -66,10 +70,11 @@ app.post("/login", (req, res) => {
 });
 
 app.post("/createsurvey", (req, res) => {
-  const { title, description, userId, questions } = req.body;
+  const { title, description, userId, questions, start_date, end_date } =
+    req.body;
   const sqlPoll =
-    "INSERT INTO Polls (title, description, user_id) VALUES ($1, $2, $3) RETURNING *";
-  const valuesPoll = [title, description, userId];
+    "INSERT INTO Polls (title, description, user_id, start_date, end_date) VALUES ($1, $2, $3 ,$4 ,$5) RETURNING *";
+  const valuesPoll = [title, description, userId, start_date, end_date];
 
   pool.query(sqlPoll, valuesPoll).then((data) => {
     const pollId = data.rows[0].id;
@@ -109,9 +114,9 @@ app.post("/createsurvey", (req, res) => {
   });
 });
 
-app.get("/getQuestions/:userId", (req, res) => {
+app.get("/getPolls/:userId", (req, res) => {
   const { userId } = req.params;
-  const sql = "SELECT * FROM Questions WHERE user_id = $1";
+  const sql = "SELECT * FROM Polls WHERE user_id = $1 ORDER BY created_at DESC";
   const values = [userId];
 
   pool

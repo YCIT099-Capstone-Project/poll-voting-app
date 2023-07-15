@@ -30,6 +30,9 @@ const FormBuilder = () => {
   const [description, setDescription] = useState("");
   const [data, setData] = useState([]);
   const [formData, setFormData] = useState("text");
+  const [startDate, setStartDate] = useState(new Date());
+  const [endDate, setEndDate] = useState(new Date());
+
   const user = useSelector(selectUser);
 
   const items = data;
@@ -38,6 +41,8 @@ const FormBuilder = () => {
     try {
       const userId = user.id;
       const payload = {
+        start_date: startDate,
+        end_date: endDate,
         title,
         description,
         userId,
@@ -288,6 +293,10 @@ const FormBuilder = () => {
             setTitle={setTitle}
             description={description}
             setDescription={setDescription}
+            startDate={startDate}
+            setStartDate={setStartDate}
+            endDate={endDate}
+            setEndDate={setEndDate}
           />
           <Nestable
             items={items}
