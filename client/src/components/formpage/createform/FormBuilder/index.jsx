@@ -1,8 +1,8 @@
-import { Fragment, useState } from "react";
+import { Fragment, useState, useEffect } from "react";
 import uuid from "react-uuid";
 import Nestable from "react-nestable";
 //Material UI Components
-import { Grid, Tooltip, IconButton } from "@mui/material";
+import { Grid, Tooltip, IconButton, Button, Box } from "@mui/material";
 //Icons
 import { AddCircleOutline as AddCircleOutlineIcon } from "@mui/icons-material";
 //Form Elements
@@ -18,6 +18,9 @@ import Layout from "./elements/layout";
 import { formEl } from "./constants.js";
 //Components
 import Header from "./Header";
+import axios from "axios";
+import { useSelector } from "react-redux";
+import { selectUser } from "../../../../redux/features/userSlice";
 
 const FormBuilder = () => {
   const initVal = formEl[0]?.value;
@@ -27,8 +30,28 @@ const FormBuilder = () => {
   const [description, setDescription] = useState("");
   const [data, setData] = useState([]);
   const [formData, setFormData] = useState("text");
+  const user = useSelector(selectUser);
 
   const items = data;
+  const handleSubmit = async (event) => {
+    event.preventDefault();
+    try {
+      const userId = user.id;
+      const payload = {
+        title,
+        description,
+        userId,
+        questions: data,
+      };
+      const response = await axios.post(
+        "http://localhost:4000/createsurvey",
+        payload
+      );
+      console.log(response.data);
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
   //Function to add new element
   const addElement = () => {
@@ -285,6 +308,26 @@ const FormBuilder = () => {
           </Tooltip>
         </Grid>
       </Grid>
+      <Box sx={{ width: "fit-content", margin: "0 auto" }}>
+        <Button
+          type="submit"
+          sx={{
+            backgroundColor: "#9C27B0",
+            color: "white",
+            fontSize: "20px",
+            padding: "10px 60px",
+            borderRadius: "5px",
+            cursor: "pointer",
+            transition: "opacity 0.36s ease", // Add transition property for opacity
+            "&:hover": {
+              backgroundColor: "#BA68C8",
+            },
+          }}
+          onClick={handleSubmit}
+        >
+          Submit
+        </Button>
+      </Box>
     </Fragment>
   );
 };

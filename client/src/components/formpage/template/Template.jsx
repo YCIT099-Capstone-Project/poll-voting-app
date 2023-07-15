@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useContext } from "react";
 import "./Template.css";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 import { IconButton } from "@mui/material";
@@ -6,14 +6,16 @@ import UnfoldMoreIcon from "@mui/icons-material/UnfoldMore";
 import { Blank } from "../../../assets/img";
 import uuid from "react-uuid";
 import { useNavigate } from "react-router-dom";
+import { SurveyContext } from "../../../context/SurveyContext";
 
 const Template = () => {
+  const { id, createSurvey } = useContext(SurveyContext);
+
   const navigateTo = useNavigate();
 
-  const createSurvey = () => {
-    const id_ = uuid();
-
-    navigateTo(`/forms/create/${id_}`);
+  const handleSurveyCreation = () => {
+    createSurvey();
+    navigateTo(`/forms/create/${id}`);
   };
   return (
     <div className="template_section">
@@ -39,15 +41,7 @@ const Template = () => {
         </div>
       </div>
       <div className="template_body">
-        <div className="card" onClick={createSurvey}>
-          <img src={Blank} alt="Blank Card" className="card_img" />
-          <p className="card_title">Blank</p>
-        </div>
-        <div className="card">
-          <img src={Blank} alt="Blank Card" className="card_img" />
-          <p className="card_title">Blank</p>
-        </div>
-        <div className="card">
+        <div className="card" onClick={handleSurveyCreation}>
           <img src={Blank} alt="Blank Card" className="card_img" />
           <p className="card_title">Blank</p>
         </div>

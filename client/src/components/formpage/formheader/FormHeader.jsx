@@ -7,8 +7,18 @@ import { Avatar } from "@mui/material";
 import "./FormHeader.css";
 import logo from "../../images/Pollite.jpeg";
 import TestDrawer from "../TestDrawer";
+import LogoutIcon from "@mui/icons-material/Logout";
+import { useDispatch, useSelector } from "react-redux";
+import { logout, selectUser } from "../../../redux/features/userSlice";
 
 const FormHeader = () => {
+  const user = useSelector(selectUser);
+  const dispatch = useDispatch();
+  const handleLogout = (e) => {
+    e.preventDefault();
+    dispatch(logout());
+  };
+
   return (
     <div className="header">
       <div className="header_left">
@@ -45,7 +55,10 @@ const FormHeader = () => {
           <AppsIcon />
         </IconButton>
         <IconButton>
-          <Avatar src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/59/User-avatar.svg/2048px-User-avatar.svg.png" />
+          <p>{user.name}</p>
+        </IconButton>
+        <IconButton onClick={handleLogout}>
+          <LogoutIcon />
         </IconButton>
       </div>
     </div>
