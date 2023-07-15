@@ -1,23 +1,27 @@
 import React, { useEffect, useState } from "react";
 import { ArrowDropDown, More, Storage, FolderOpen } from "@mui/icons-material";
-import { IconButton, Menu, MenuItem } from "@mui/material";
+import { IconButton, Menu, MenuItem, Button } from "@mui/material";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 import { useSelector } from "react-redux";
 import moment from "moment";
 import "./MainFormBody.css";
 import { selectUser } from "../../../redux/features/userSlice";
+import { Link } from "react-router-dom";
 
 const MainFormBody = () => {
   const [polls, setPolls] = useState([]);
   const [anchorEl, setAnchorEl] = useState(null);
+  const [selectedPoll, setSelectedPoll] = useState(null);
   const open = Boolean(anchorEl);
 
-  const handleMenu = (event) => {
+  const handleMenu = (event, poll) => {
+    setSelectedPoll(poll);
     setAnchorEl(event.currentTarget);
   };
 
   const handleClose = () => {
     setAnchorEl(null);
+    setSelectedPoll(null);
   };
 
   const user = useSelector(selectUser);
@@ -31,7 +35,6 @@ const MainFormBody = () => {
   }, [user]);
 
   const deletePoll = (pollId) => {
-    console.log(`Deleting poll with id: ${pollId}`);
     fetch(`http://localhost:4000/deletePoll/${pollId}`, {
       method: "DELETE",
     })
@@ -48,10 +51,6 @@ const MainFormBody = () => {
         }
       })
       .catch((err) => console.error(err));
-  };
-  const handleDelete = (pollId) => {
-    deletePoll(pollId);
-    handleClose();
   };
 
   return (
@@ -124,7 +123,7 @@ const MainFormBody = () => {
                   />
                   created {moment(poll.start_date).format("MMM D, YYYY")}
                 </div>
-                <IconButton onClick={handleMenu}>
+                <IconButton onClick={(event) => handleMenu(event, poll)}>
                   <MoreVertIcon
                     style={{
                       fontSize: "12px",
@@ -136,7 +135,7 @@ const MainFormBody = () => {
                   id="long-menu"
                   anchorEl={anchorEl}
                   keepMounted
-                  open={open}
+                  open={open && selectedPoll?.id === poll.id}
                   onClose={handleClose}
                   PaperProps={{
                     style: {
@@ -145,11 +144,29 @@ const MainFormBody = () => {
                     },
                   }}
                 >
-                  <MenuItem onClick={handleClose}>Update</MenuItem>
-                  <MenuItem onClick={() => handleDelete(poll.id)}>
+                  <MenuItem
+                    component={Link}
+                    to={`/forms/${poll.id}/edit`}
+                    onClick={handleClose}
+                  >
+                    Edit
+                  </MenuItem>
+                  <MenuItem
+                    component={Link}
+                    to={`/forms/${poll.id}/responses`}
+                    onClick={handleClose}
+                  >
+                    View Responses
+                  </MenuItem>
+                  <MenuItem
+                    onClick={() => {
+                      handleClose();
+                      deletePoll(poll.id);
+                    }}
+                  >
                     Delete
                   </MenuItem>
-                </Menu>{" "}
+                </Menu>
               </div>
             </div>
           </div>
