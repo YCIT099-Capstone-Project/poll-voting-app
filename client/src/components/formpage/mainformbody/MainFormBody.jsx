@@ -123,9 +123,7 @@ const MainFormBody = () => {
                   />
                   created {moment(poll.start_date).format("MMM D, YYYY")}
                 </div>
-                <IconButton
-                  onClick={(event) => handleMenu(event, poll)}
-                >
+                <IconButton onClick={(event) => handleMenu(event, poll)}>
                   <MoreVertIcon
                     style={{
                       fontSize: "12px",
