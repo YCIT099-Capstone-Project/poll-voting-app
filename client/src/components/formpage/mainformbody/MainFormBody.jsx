@@ -31,6 +31,7 @@ const MainFormBody = () => {
   }, [user]);
 
   const deletePoll = (pollId) => {
+    console.log(`Deleting poll with id: ${pollId}`);
     fetch(`http://localhost:4000/deletePoll/${pollId}`, {
       method: "DELETE",
     })
@@ -47,6 +48,10 @@ const MainFormBody = () => {
         }
       })
       .catch((err) => console.error(err));
+  };
+  const handleDelete = (pollId) => {
+    deletePoll(pollId);
+    handleClose();
   };
 
   return (
@@ -119,37 +124,9 @@ const MainFormBody = () => {
                   />
                   created {moment(poll.start_date).format("MMM D, YYYY")}
                 </div>
-                <IconButton onClick={handleMenu}>
-                  <MoreVertIcon
-                    style={{
-                      fontSize: "12px",
-                      color: "gray",
-                    }}
-                  />
-                </IconButton>
-                <Menu
-                  id="long-menu"
-                  anchorEl={anchorEl}
-                  keepMounted
-                  open={open}
-                  onClose={handleClose}
-                  PaperProps={{
-                    style: {
-                      maxHeight: 48 * 4.5,
-                      width: "20ch",
-                    },
-                  }}
-                >
-                  <MenuItem onClick={handleClose}>Update</MenuItem>
-                  <MenuItem
-                    onClick={() => {
-                      handleClose();
-                      deletePoll(poll.id);
-                    }}
-                  >
-                    Delete
-                  </MenuItem>
-                </Menu>{" "}
+
+                <button onClick={() => deletePoll(poll.id)}>Delete</button>
+                <button>Update</button>
               </div>
             </div>
           </div>
