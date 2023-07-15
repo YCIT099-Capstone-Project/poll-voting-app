@@ -1,6 +1,6 @@
-// Footer.jsx
-
 import React from 'react';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faFacebookF, faTwitter, faInstagram } from '@fortawesome/free-brands-svg-icons';
 
 const Footer = () => {
   return (
@@ -15,9 +15,9 @@ const Footer = () => {
         <div className="social-media">
           <h3>Follow Us</h3>
           <ul>
-            <li><a href="#"><i className="fab fa-facebook-f"></i></a></li>
-            <li><a href="#"><i className="fab fa-twitter"></i></a></li>
-            <li><a href="#"><i className="fab fa-instagram"></i></a></li>
+            <li><a href="#"><FontAwesomeIcon icon={faFacebookF} /></a></li>
+            <li><a href="#"><FontAwesomeIcon icon={faTwitter} /></a></li>
+            <li><a href="#"><FontAwesomeIcon icon={faInstagram} /></a></li>
           </ul>
         </div>
       </div>
