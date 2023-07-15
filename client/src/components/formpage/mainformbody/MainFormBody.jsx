@@ -124,9 +124,16 @@ const MainFormBody = () => {
                   />
                   created {moment(poll.start_date).format("MMM D, YYYY")}
                 </div>
-
-                <button onClick={() => deletePoll(poll.id)}>Delete</button>
-                <button>Update</button>
+                <IconButton onClick={handleMenu}>
+                  <MoreVertIcon
+                    style={{
+                      fontSize: "12px",
+                      color: "gray",
+                    }}
+                  />
+                  <button onClick={() => deletePoll(poll.id)}>Delete</button>
+                  <button onClick={() => deletePoll(poll.id)}>Update</button>
+                </IconButton>
               </div>
             </div>
           </div>
