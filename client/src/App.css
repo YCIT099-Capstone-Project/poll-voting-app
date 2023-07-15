@@ -21,7 +21,8 @@ body {
 #root {
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
+  min-height: 100vh; /* Set minimum height to fill the viewport */
+  position: relative; /* Add positioning context for the footer */
 }
 
 /* Header styles */
@@ -70,8 +71,11 @@ section h1 {
 footer {
   background-color: #9c9df1;
   color: #fcfcfc;
-  padding: 50px 20px;
-  margin-top: auto;
+  padding: 20px; /* Adjust the padding to control the height */
+  position: absolute; /* Position the footer at the bottom */
+  left: 0;
+  right: 0;
+  bottom: 0;
 }
 
 .footer-content {
