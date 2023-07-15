@@ -64,7 +64,7 @@ const MainFormBody = () => {
         {polls.map((poll) => (
           <div className="doc_card" key={poll.id}>
             <img
-              src="https://images.ctfassets.net/lzny33ho1g45/1vWnEBZDXN5vfqdTPo8F1K/15eddd18711b135a251ebd2bdfe3e59e/Google_Forms_Fields"
+              src="https://www.hostinger.com/tutorials/wp-content/uploads/sites/2/2019/01/getting-google-form-link-by-clicking-send-button.webp"
               alt=""
               className="doc_img"
             />
