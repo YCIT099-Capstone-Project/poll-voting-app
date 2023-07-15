@@ -131,9 +131,25 @@ const MainFormBody = () => {
                       color: "gray",
                     }}
                   />
-                  <button onClick={() => deletePoll(poll.id)}>Delete</button>
-                  <button onClick={() => deletePoll(poll.id)}>Update</button>
                 </IconButton>
+                <Menu
+                  id="long-menu"
+                  anchorEl={anchorEl}
+                  keepMounted
+                  open={open}
+                  onClose={handleClose}
+                  PaperProps={{
+                    style: {
+                      maxHeight: 48 * 4.5,
+                      width: "20ch",
+                    },
+                  }}
+                >
+                  <MenuItem onClick={handleClose}>Update</MenuItem>
+                  <MenuItem onClick={() => handleDelete(poll.id)}>
+                    Delete
+                  </MenuItem>
+                </Menu>{" "}
               </div>
             </div>
           </div>
