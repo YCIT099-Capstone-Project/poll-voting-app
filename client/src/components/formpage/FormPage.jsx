@@ -7,6 +7,9 @@ import FormBuilder from "./createform/FormBuilder";
 import { useSelector } from "react-redux";
 import { selectUser } from "../../redux/features/userSlice";
 import { SurveyProvider } from "./SurveyProvider";
+import EditFormPage from "./ResponseEdit/EditFormPage";
+import ViewResponsesPage from "./ResponseEdit/ViewResponsesPage";
+
 
 const FormPage = () => {
   const user = useSelector(selectUser);
@@ -28,6 +31,26 @@ const FormPage = () => {
               }
             />
             <Route
+              path="/:formId/edit"
+              element={
+                <>
+                  <SurveyProvider>
+                    <EditFormPage />
+                  </SurveyProvider>
+                </>
+              }
+            />
+            <Route
+              path="/:formId/responses"
+              element={
+                <>
+                  <SurveyProvider>
+                    <ViewResponsesPage />
+                  </SurveyProvider>
+                </>
+              }
+            />
+            <Route
               path="/"
               element={
                 <>
@@ -41,7 +64,7 @@ const FormPage = () => {
           </Routes>
         </>
       ) : (
-        <p>You are not authraized</p>
+        <p>You are not authorized</p>
       )}
     </>
   );
