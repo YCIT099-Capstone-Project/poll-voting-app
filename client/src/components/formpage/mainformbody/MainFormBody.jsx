@@ -1,6 +1,10 @@
-import React, { useEffect, useState } from "react";
-import { ArrowDropDown, More, Storage, FolderOpen } from "@mui/icons-material";
-import { IconButton, Menu, MenuItem, Button } from "@mui/material";
+import React, { useState, useEffect } from "react";
+import {
+  ArrowDropDown,
+  Storage,
+  FolderOpen,
+} from "@mui/icons-material";
+import { IconButton, Menu, MenuItem } from "@mui/material";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 import { useSelector } from "react-redux";
 import moment from "moment";
@@ -12,6 +16,7 @@ const MainFormBody = () => {
   const [polls, setPolls] = useState([]);
   const [anchorEl, setAnchorEl] = useState(null);
   const [selectedPoll, setSelectedPoll] = useState(null);
+  const [copySuccess, setCopySuccess] = useState(false);
   const open = Boolean(anchorEl);
 
   const handleMenu = (event, poll) => {
@@ -25,6 +30,7 @@ const MainFormBody = () => {
   };
 
   const user = useSelector(selectUser);
+  
   useEffect(() => {
     if (user && user.id) {
       fetch(`http://localhost:4000/getPolls/${user.id}`)
@@ -43,9 +49,7 @@ const MainFormBody = () => {
         if (data.message) {
           console.log(data.message);
           // Remove the poll from the list of polls
-          setPolls((prevPolls) =>
-            prevPolls.filter((poll) => poll.id !== pollId)
-          );
+          setPolls((prevPolls) => prevPolls.filter((poll) => poll.id !== pollId));
         } else if (data.error) {
           console.error(data.error);
         }
@@ -53,43 +57,31 @@ const MainFormBody = () => {
       .catch((err) => console.error(err));
   };
 
+  const handleCopyLink = (pollId) => {
+    const link = `http://localhost:3000/forms/${pollId}`;
+    navigator.clipboard.writeText(link)
+      .then(() => {
+        setCopySuccess(true);
+        setTimeout(() => setCopySuccess(false), 2000);
+      })
+      .catch((err) => console.error(err));
+  };
+
   return (
     <div className="main_body">
       <div className="mainbody_top">
-        <div
-          className="mainbody_top_left"
-          style={{
-            fontSize: "16px",
-            fontWeight: "500",
-          }}
-        >
+        <div className="mainbody_top_left">
           Recent Forms
         </div>
         <div className="mainbody_top_right">
-          <div
-            className="mainbody_top_center"
-            style={{
-              fontSize: "14px",
-              marginRight: "125px",
-            }}
-          >
+          <div className="mainbody_top_center">
             Owned by Anyone <ArrowDropDown />
           </div>
           <IconButton>
-            <Storage
-              style={{
-                fontSize: "16px",
-                color: "black",
-              }}
-            />
+            <Storage />
           </IconButton>
           <IconButton>
-            <FolderOpen
-              style={{
-                fontSize: "16px",
-                color: "black",
-              }}
-            />
+            <FolderOpen />
           </IconButton>
         </div>
       </div>
@@ -102,36 +94,27 @@ const MainFormBody = () => {
               className="doc_img"
             />
             <div className="doc_card_content">
-              <h5>{poll.title}</h5>
-              <div
-                className="doc_content"
-                style={{
-                  fontSize: "12px",
-                  color: "gray",
-                }}
-              >
-                <div className="content_left">
-                  <Storage
-                    style={{
-                      color: "white",
-                      fontSize: "12px",
-                      backgroundColor: "#6e2594",
-                      padding: "3px",
-                      marginRight: "3px",
-                      borderRadius: "2px",
-                    }}
-                  />
-                  created {moment(poll.start_date).format("MMM D, YYYY")}
-                </div>
-                <IconButton
-                  onClick={(event) => handleMenu(event, poll)}
-                >
-                  <MoreVertIcon
-                    style={{
-                      fontSize: "12px",
-                      color: "gray",
-                    }}
-                  />
+              {poll.title && (
+                <h5>{poll.title}</h5>
+              )}
+              <div className="doc_content">
+                {poll.start_date && (
+                  <div className="content_left">
+                    <Storage
+                      style={{
+                        color: "white",
+                        fontSize: "12px",
+                        backgroundColor: "#6e2594",
+                        padding: "3px",
+                        marginRight: "3px",
+                        borderRadius: "2px",
+                      }}
+                    />
+                    created {moment(poll.start_date).format("MMM D, YYYY")}
+                  </div>
+                )}
+                <IconButton onClick={(event) => handleMenu(event, poll)}>
+                  <MoreVertIcon style={{ fontSize: "12px", color: "gray" }} />
                 </IconButton>
                 <Menu
                   id="long-menu"
@@ -167,6 +150,14 @@ const MainFormBody = () => {
                     }}
                   >
                     Delete
+                  </MenuItem>
+                  <MenuItem onClick={handleClose}>
+                   <div
+                      className={copySuccess ? "copy-link-btn success" : "copy-link-btn"}
+                      onClick={() => handleCopyLink(poll.id)}
+                  >
+                      {copySuccess ? "Link Copied!" : "Copy Link"}
+                      </div>
                   </MenuItem>
                 </Menu>
               </div>
