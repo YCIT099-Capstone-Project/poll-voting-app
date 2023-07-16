@@ -1,9 +1,5 @@
 import React, { useState, useEffect } from "react";
-import {
-  ArrowDropDown,
-  Storage,
-  FolderOpen,
-} from "@mui/icons-material";
+import { ArrowDropDown, Storage, FolderOpen } from "@mui/icons-material";
 import { IconButton, Menu, MenuItem } from "@mui/material";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 import { useSelector } from "react-redux";
@@ -30,7 +26,7 @@ const MainFormBody = () => {
   };
 
   const user = useSelector(selectUser);
-  
+
   useEffect(() => {
     if (user && user.id) {
       fetch(`http://localhost:4000/getPolls/${user.id}`)
@@ -49,7 +45,9 @@ const MainFormBody = () => {
         if (data.message) {
           console.log(data.message);
           // Remove the poll from the list of polls
-          setPolls((prevPolls) => prevPolls.filter((poll) => poll.id !== pollId));
+          setPolls((prevPolls) =>
+            prevPolls.filter((poll) => poll.id !== pollId)
+          );
         } else if (data.error) {
           console.error(data.error);
         }
@@ -59,7 +57,8 @@ const MainFormBody = () => {
 
   const handleCopyLink = (pollId) => {
     const link = `http://localhost:3000/forms/${pollId}`;
-    navigator.clipboard.writeText(link)
+    navigator.clipboard
+      .writeText(link)
       .then(() => {
         setCopySuccess(true);
         setTimeout(() => setCopySuccess(false), 2000);
@@ -70,9 +69,7 @@ const MainFormBody = () => {
   return (
     <div className="main_body">
       <div className="mainbody_top">
-        <div className="mainbody_top_left">
-          Recent Forms
-        </div>
+        <div className="mainbody_top_left">Recent Forms</div>
         <div className="mainbody_top_right">
           <div className="mainbody_top_center">
             Owned by Anyone <ArrowDropDown />
@@ -94,9 +91,7 @@ const MainFormBody = () => {
               className="doc_img"
             />
             <div className="doc_card_content">
-              {poll.title && (
-                <h5>{poll.title}</h5>
-              )}
+              {poll.title && <h5>{poll.title}</h5>}
               <div className="doc_content">
                 {poll.start_date && (
                   <div className="content_left">
@@ -132,10 +127,14 @@ const MainFormBody = () => {
                   <MenuItem
                     component={Link}
                     to={`/forms/${poll.id}/edit`}
-                    onClick={handleClose}
+                    onClick={() => {
+                      console.log("poll.id:", poll.id);
+                      handleClose();
+                    }}
                   >
                     Edit
                   </MenuItem>
+
                   <MenuItem
                     component={Link}
                     to={`/forms/${poll.id}/responses`}
@@ -152,12 +151,14 @@ const MainFormBody = () => {
                     Delete
                   </MenuItem>
                   <MenuItem onClick={handleClose}>
-                   <div
-                      className={copySuccess ? "copy-link-btn success" : "copy-link-btn"}
+                    <div
+                      className={
+                        copySuccess ? "copy-link-btn success" : "copy-link-btn"
+                      }
                       onClick={() => handleCopyLink(poll.id)}
-                  >
+                    >
                       {copySuccess ? "Link Copied!" : "Copy Link"}
-                      </div>
+                    </div>
                   </MenuItem>
                 </Menu>
               </div>

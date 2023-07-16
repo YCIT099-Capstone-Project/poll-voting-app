@@ -228,17 +228,6 @@ const FormBuilder = () => {
             duplicateElement={duplicateElement}
           />
         );
-      case "number":
-        return (
-          <NumberInput
-            item={item}
-            handleValue={handleValue}
-            deleteEl={deleteEl}
-            handleRequired={handleRequired}
-            handleElType={handleElType}
-            duplicateElement={duplicateElement}
-          />
-        );
       case "radio":
         return (
           <RadioInput
@@ -250,30 +239,6 @@ const FormBuilder = () => {
             addOption={addOption}
             handleOptionValues={handleOptionValues}
             deleteOption={deleteOption}
-            duplicateElement={duplicateElement}
-          />
-        );
-      case "date":
-        return (
-          <DateInput
-            item={item}
-            handleValue={handleValue}
-            deleteEl={deleteEl}
-            handleRequired={handleRequired}
-            handleElType={handleElType}
-            handleDate={handleDate}
-            duplicateElement={duplicateElement}
-          />
-        );
-      case "time":
-        return (
-          <TimeInput
-            item={item}
-            handleValue={handleValue}
-            deleteEl={deleteEl}
-            handleRequired={handleRequired}
-            handleElType={handleElType}
-            handleTime={handleTime}
             duplicateElement={duplicateElement}
           />
         );

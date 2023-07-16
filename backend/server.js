@@ -148,6 +148,222 @@ app.delete("/deletePoll/:pollId", (req, res) => {
     });
 });
 
+app.get("/getPoll/:pollId", (req, res) => {
+  const { pollId } = req.params;
+  const sql = "SELECT * FROM Polls WHERE id = $1";
+  const values = [pollId];
+
+  pool
+    .query(sql, values)
+    .then((data) => {
+      if (data.rows.length > 0) {
+        res.json(data.rows[0]);
+      } else {
+        res.status(404).json({ error: "Poll not found" });
+      }
+    })
+    .catch((err) => {
+      res.status(500).json({ error: "Server error" });
+    });
+});
+
+// Update a specific poll by id
+app.put("/updatePoll/:pollId", async (req, res) => {
+  const { pollId } = req.params;
+  const { title, description, start_date, end_date, questions } = req.body;
+
+  const client = await pool.connect();
+  try {
+    await client.query("BEGIN");
+
+    const pollUpdateSql =
+      "UPDATE Polls SET title = $1, description = $2, start_date = $3, end_date = $4 WHERE id = $5 RETURNING *";
+    const pollUpdateValues = [title, description, start_date, end_date, pollId];
+    const pollUpdateResult = await client.query(
+      pollUpdateSql,
+      pollUpdateValues
+    );
+
+    if (pollUpdateResult.rows.length === 0) {
+      throw new Error("Poll not found");
+    }
+
+    const questionUpdateSql =
+      "UPDATE Questions SET question_text = $1 WHERE id = $2 AND poll_id = $3 RETURNING *";
+    for (let i = 0; i < questions.length; i++) {
+      const questionUpdateValues = [
+        questions[i].question_text,
+        questions[i].id,
+        pollId,
+      ];
+      const questionUpdateResult = await client.query(
+        questionUpdateSql,
+        questionUpdateValues
+      );
+      if (questionUpdateResult.rows.length === 0) {
+        throw new Error(`Question id ${questions[i].id} not found`);
+      }
+    }
+
+    await client.query("COMMIT");
+    res.json(pollUpdateResult.rows[0]);
+  } catch (error) {
+    await client.query("ROLLBACK");
+    res.status(500).json({ error: error.message });
+  } finally {
+    client.release();
+  }
+});
+
+app.get("/getQuestions/:pollId", (req, res) => {
+  const { pollId } = req.params;
+  const sql = "SELECT * FROM Questions WHERE poll_id = $1";
+  const values = [pollId];
+
+  pool
+    .query(sql, values)
+    .then((data) => {
+      const questions = data.rows;
+      let counter = 0;
+
+      // If no questions are found, return an empty array.
+      if (questions.length === 0) {
+        res.json([]);
+      } else {
+        // For each question, get related answers from the Answers table.
+        questions.forEach((question, index) => {
+          const sqlAnswers = "SELECT * FROM Answers WHERE question_id = $1";
+          const valuesAnswers = [question.id];
+
+          pool
+            .query(sqlAnswers, valuesAnswers)
+            .then((data) => {
+              // Append the related answers to the question object.
+              questions[index].answers = data.rows;
+              counter++;
+
+              // When all questions have been processed, send the response.
+              if (counter === questions.length) {
+                res.json(questions);
+              }
+            })
+            .catch((err) => {
+              console.error(err);
+              res.status(500).json({ error: "Server error" });
+            });
+        });
+      }
+    })
+    .catch((err) => {
+      console.error(err);
+      res.status(500).json({ error: "Server error" });
+    });
+});
+
+app.put("/updateQuestion/:questionId", async (req, res) => {
+  const { questionId } = req.params;
+  const { question_text } = req.body; // assumes the question text is sent in the request body
+
+  try {
+    const sql =
+      "UPDATE Questions SET question_text = $1 WHERE id = $2 RETURNING *";
+    const values = [question_text, questionId];
+
+    const result = await pool.query(sql, values);
+
+    if (result.rows.length > 0) {
+      res.status(200).json(result.rows[0]);
+    } else {
+      res.status(404).json({ error: "Question not found" });
+    }
+  } catch (error) {
+    res.status(500).json({ error: "Failed to update question" });
+  }
+});
+app.post("/submitResponses/:pollId", async (req, res) => {
+  const { pollId } = req.params;
+  const { participantToken, responses } = req.body;
+
+  const client = await pool.connect();
+  try {
+    await client.query("BEGIN");
+
+    // 1. Check if the participant has already responded to the poll
+    const participantSql =
+      "SELECT * FROM Participants WHERE participation_token = $1";
+    const participantValues = [participantToken];
+    const participantResult = await client.query(
+      participantSql,
+      participantValues
+    );
+    let participantId;
+    if (participantResult.rows.length > 0) {
+      participantId = participantResult.rows[0].id;
+      const participatedSql =
+        "SELECT * FROM Participants_Polls WHERE participant_id = $1 AND poll_id = $2";
+      const participatedValues = [participantId, pollId];
+      const participatedResult = await client.query(
+        participatedSql,
+        participatedValues
+      );
+      if (participatedResult.rows.length > 0) {
+        throw new Error("Participant has already responded to this poll");
+      }
+    } else {
+      // 2. If they haven't, insert a new row in the Participants table and in the Participants_Polls table
+      const newParticipantSql =
+        "INSERT INTO Participants (participation_token, started_at, completed_at) VALUES ($1, NOW(), NOW()) RETURNING id";
+      const newParticipantValues = [participantToken];
+      const newParticipantResult = await client.query(
+        newParticipantSql,
+        newParticipantValues
+      );
+      participantId = newParticipantResult.rows[0].id;
+
+      const newParticipationSql =
+        "INSERT INTO Participants_Polls (participant_id, poll_id) VALUES ($1, $2)";
+      const newParticipationValues = [participantId, pollId];
+      await client.query(newParticipationSql, newParticipationValues);
+    }
+
+    // 3. Insert rows in the Responses table for each answer the participant provided
+    for (let i = 0; i < responses.length; i++) {
+      const { questionId, answerId, responseValue } = responses[i];
+      const responseSql =
+        "INSERT INTO Responses (participant_id, question_id, answer_id, response_value) VALUES ($1, $2, $3, $4)";
+      const responseValues = [
+        participantId,
+        questionId,
+        answerId,
+        responseValue,
+      ];
+      await client.query(responseSql, responseValues);
+    }
+
+    await client.query("COMMIT");
+    res.json({ message: "Responses submitted successfully" });
+  } catch (error) {
+    await client.query("ROLLBACK");
+    res.status(500).json({ error: error.message });
+  } finally {
+    client.release();
+  }
+});
+app.get("/getAnswers/:questionId", (req, res) => {
+  const { questionId } = req.params;
+  const sql = "SELECT * FROM Answers WHERE question_id = $1";
+  const values = [questionId];
+
+  pool
+    .query(sql, values)
+    .then((data) => {
+      res.json(data.rows);
+    })
+    .catch((err) => {
+      res.status(500).json({ error: "Server error" });
+    });
+});
+
 const PORT = process.env.PORT || 4000;
 app.listen(PORT, () => {
   console.log(`Server is listening on port ${PORT}`);
